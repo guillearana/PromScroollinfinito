@@ -27,26 +27,29 @@ class MainActivity : AppCompatActivity() {
 
         tareaAdapter = TareaAdapter(
             listaTareas,
-            { position -> // Manejo del clic en el tick
+            { position ->
                 listaTareas.removeAt(position)
                 tareaAdapter.notifyItemRemoved(position)
                 tareaAdapter.notifyItemRangeChanged(position, listaTareas.size)
             },
-            { position -> // Manejo del clic en la estrella
+            { position ->
                 val tarea = listaTareas[position]
                 if (tarea.esFavorita) {
-                    // Si ya es favorita, la quitamos
+                    // Si es favorita, la desmarcamos y la devolvemos a su posición original
                     tarea.esFavorita = false
-                    // Volver a añadir a la lista sin moverla
-                    tareaAdapter.notifyItemChanged(position)
+                    val nuevaPosicion = tarea.posicionOriginal
+                    listaTareas.removeAt(position)
+                    listaTareas.add(nuevaPosicion, tarea)
+                    tareaAdapter.notifyItemMoved(position, nuevaPosicion)
                 } else {
-                    // Si no es favorita, la marcamos como favorita
+                    // Si no es favorita, la marcamos como favorita y la colocamos al principio
                     tarea.esFavorita = true
-                    listaTareas.removeAt(position) // Remover de la posición actual
-                    listaTareas.add(0, tarea) // Agregar como favorita al inicio
-                    tareaAdapter.notifyItemMoved(position, 0) // Notificar el movimiento
-                    tareaAdapter.notifyItemChanged(0) // Notificar que el primer item ha cambiado
+                    tarea.posicionOriginal = position // Guardar la posición original
+                    listaTareas.removeAt(position)
+                    listaTareas.add(0, tarea)
+                    tareaAdapter.notifyItemMoved(position, 0)
                 }
+                tareaAdapter.notifyDataSetChanged()
             }
         )
 
@@ -59,14 +62,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun agregarTarea() {
-        val nuevaTarea = tareaInput.text.toString()
-        if (!TextUtils.isEmpty(nuevaTarea)) {
-            listaTareas.add(Tarea(nuevaTarea)) // Agregar tarea como objeto Tarea
+        val nuevaTareaTexto = tareaInput.text.toString()
+        if (!TextUtils.isEmpty(nuevaTareaTexto)) {
+            val nuevaTarea = Tarea(nuevaTareaTexto, false, listaTareas.size) // Al añadir, asignamos la posición inicial
+            listaTareas.add(nuevaTarea)
             tareaAdapter.notifyItemInserted(listaTareas.size - 1)
             tareaInput.setText("")
         }
     }
 }
+
 
 
 

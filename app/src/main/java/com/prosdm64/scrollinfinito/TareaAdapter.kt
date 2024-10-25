@@ -22,24 +22,18 @@ class TareaAdapter(
     override fun onBindViewHolder(holder: TareaViewHolder, position: Int) {
         val tarea = listaTareas[position]
         holder.tareaTextView.text = tarea.texto
-
-        // Cambiar el icono según si es favorita o no
         holder.starImageView.setImageResource(if (tarea.esFavorita) R.drawable.bahai_solid_24 else R.drawable.bahai_24)
 
-        // Listener para el tick
         holder.tickImageView.setOnClickListener {
             onTickClick(position)
         }
 
-        // Listener para la estrella
         holder.starImageView.setOnClickListener {
             onStarClick(position)
         }
     }
 
-    override fun getItemCount(): Int {
-        return listaTareas.size
-    }
+    override fun getItemCount(): Int = listaTareas.size
 
     inner class TareaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tareaTextView: TextView = itemView.findViewById(R.id.tareaTexto)
@@ -47,6 +41,7 @@ class TareaAdapter(
         val starImageView: ImageView = itemView.findViewById(R.id.bahai)
     }
 }
+
 
 
 
